@@ -27,9 +27,7 @@ export function Welcome() {
             </Text>
 
             <TouchableOpacity>
-                <Text>
-                    Touch
-                </Text>
+                
             </TouchableOpacity>
 
             <Button title={'Exibir'} onPress={() => handleVisibility(true)} ></Button>
