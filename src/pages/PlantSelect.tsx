@@ -3,7 +3,8 @@ import {
     View,
     Text,
     StyleSheet,
-    FlatList
+    FlatList,
+    ActivityIndicator
 } from 'react-native'
 import { EnviromentButton } from '../components/EnviromentButton'
 
@@ -19,7 +20,7 @@ export function PlantSelect() {
     const [environments, setEnvironments] = useState<enviromentProps[]>([])
     const [plants, setPlants] = useState<PlantProps[]>([])
     const [filteredPlants, setFilteredPlants] = useState<PlantProps[]>([])
-    const [enviromentSelected, setEnvironmentSelected] = useState('all')
+    const [environmentSelected, setEnvironmentSelected] = useState('all')
     const [loading, setLoading] = useState(true)
 
     const [page, setPage] = useState(1)
@@ -47,7 +48,8 @@ export function PlantSelect() {
     function handleEnvironmentSelected(environment: string){
         setEnvironmentSelected(environment)
 
-        if(environment == 'all') return setFilteredPlants(plants)
+        if(environment == 'all') 
+            return setFilteredPlants(plants)
 
         const filtered = plants.filter(plant => 
             plant.environments.includes(environment)
@@ -72,7 +74,7 @@ export function PlantSelect() {
         
         setLoading(false)
         setLoadingMore(false)
-        fetchPlants()                
+                     
    }    
 
     function handleFetchMore(distance: number){
@@ -80,9 +82,8 @@ export function PlantSelect() {
             return;
 
             setLoadingMore(true)
-            setPage(oldValue => oldValue + 1)           
-        
-        
+            setPage(oldValue => oldValue + 1)
+            fetchPlants()     
     }
 
     useEffect(() => {
@@ -94,16 +95,16 @@ export function PlantSelect() {
                      title: 'Todos'
                  },
                  ...data
-             ])
-             
+             ])             
         }    
         fetchEnvironment()    
     }, [])
 
-    useEffect(() => {
-        
+
+    useEffect(() => {        
        fetchPlants()
     }, [])
+
 
     if(loading)
         return <Load/>
@@ -121,7 +122,7 @@ export function PlantSelect() {
                         renderItem={({ item }) => (
                             <EnviromentButton 
                                 title={item.title}
-                                active={item.key === enviromentSelected}
+                                active={item.key == environmentSelected}
                                 onPress={() => handleEnvironmentSelected(item.key)}
                             />
                         )}
@@ -134,17 +135,21 @@ export function PlantSelect() {
                         <FlatList
                             data={filteredPlants}
                             renderItem={({ item }) => (
-                                <PlantCardPrimary data={item}/>
+                                <PlantCardPrimary data={item} />
                             )}
                             showsVerticalScrollIndicator={false}
                             numColumns={2}
+                            contentContainerStyle={styles.contentContainerStyle}
                             onEndReachedThreshold={0.1}
                             onEndReached={({ distanceFromEnd }) => 
                             handleFetchMore(distanceFromEnd)
-                        }
-                            
+                         }
+                           ListFooterComponent={
+                               loadingMore ? 
+                               <ActivityIndicator color={colors.green} />
+                               : <></>
+                           } 
                         />  
-
                         
                     </View>            
                 </View>
